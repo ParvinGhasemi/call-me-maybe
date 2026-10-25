@@ -1,7 +1,3 @@
-# https://docs.python.org/3/library/json.html#basic-usage
-# https://docs.python.org/3/library/json.html
-# https://www.geeksforgeeks.org/python/python-json/
-
 """Loading project's JSON files."""
 
 
