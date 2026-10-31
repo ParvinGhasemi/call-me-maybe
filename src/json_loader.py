@@ -35,7 +35,7 @@ def main() -> int:
         Path(__file__).resolve().parent / "data" / "input"
     )
     paths = [
-        # input_directory / "functions_definition.json",
+        input_directory / "functions_definition.json",
         input_directory / "function_calling_tests.json",
         input_directory,
         input_directory / "invalid_syntax.json"
@@ -48,6 +48,7 @@ def main() -> int:
             print(f"ERROR: {error}")
             print()
             print(error.__cause__)
+            print()
             return 1
 
         print(f"Loaded file: {path.name}")
