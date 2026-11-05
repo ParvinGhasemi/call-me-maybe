@@ -1,4 +1,4 @@
-"""Loading project's JSON files."""
+"""Load UTF-8 JSON files and report reading or parsing failures."""
 
 
 import json
@@ -7,11 +7,27 @@ from typing import Any
 
 
 class InputLoadError(Exception):
-    """Raised when an input file cannot be read or parsed."""
+    """Report a failure to read or parse an input file.
+
+    The loader preserves the original exception in __cause__.
+    """
 
 
 def load_json(path: Path) -> Any:
-    """Read JSON, raising InputLoadError if loading fails."""
+    """Read and parse a UTF-8 JSON file.
+
+    Args:
+        path: Path to the input file.
+
+    Returns:
+        The decoded Python value, without schema validation.
+
+    Raises:
+        InputLoadError: If the file cannot be read, decoded as UTF-8, or
+            parsed as JSON. The original exception is chained as the cause.
+
+    The file is closed automatically, including when parsing fails.
+    """
     try:
         with path.open("r", encoding="utf-8") as file:
             return json.load(file)
@@ -28,98 +44,3 @@ def load_json(path: Path) -> Any:
         raise InputLoadError(
             f"Could not read {path}: {error.strerror}"
         ) from error
-
-
-def main() -> int:
-    input_directory = (
-        Path(__file__).resolve().parent / "data" / "input"
-    )
-    paths = [
-        input_directory / "functions_definition.json",
-        input_directory / "function_calling_tests.json",
-        input_directory,
-        input_directory / "invalid_syntax.json"
-    ]
-
-    for path in paths:
-        try:
-            data = load_json(path)
-        except InputLoadError as error:
-            print(f"ERROR: {error}")
-            print()
-            print(error.__cause__)
-            print()
-            return 1
-
-        print(f"Loaded file: {path.name}")
-        print(f"Python type: {type(data).__name__}")
-        print()
-        print(data)
-        print("=" * 50)
-        print()
-
-    return 0
-
-
-
-
-
-
-# """ test main """
-# from .prompt_validator import validate_prompts
-# def main() -> int:
-#     """Try every input fixture and report loading or validation failures."""
-#     input_directory = (
-#         Path(__file__).resolve().parent / "data" / "input"
-#     )
-
-#     paths = sorted(input_directory.glob("*.json"))
-#     paths.extend([
-#         input_directory / "missing.json",
-#         input_directory,  # A directory instead of a file.
-#     ])
-
-#     failures = 0
-
-#     for path in paths:
-#         print()
-#         print(f"\nTesting: {path.name}")
-
-#         try:
-#             data = load_json(path)
-#         except InputLoadError as error:
-#             failures += 1
-#             print(f"LOAD ERROR: {error}")
-
-#             cause = error.__cause__
-#             if cause is not None:
-#                 print(f"Original error: {type(cause).__name__}")
-
-#             continue
-
-#         print("Loading succeeded.")
-
-#         if path.name == "functions_definition.json":
-#             print("Skipping prompt validation: function definitions.")
-#             continue
-
-#         try:
-#             prompts = validate_prompts(data)
-#         except ValueError as error:
-#             failures += 1
-#             print(f"VALIDATION ERROR: {error}")
-
-#             cause = error.__cause__
-#             if cause is not None:
-#                 print(cause)
-
-#             continue
-
-#         print(f"Validation succeeded: {len(prompts)} prompt(s).")
-
-#     print(f"\nFinished: {failures} input(s) rejected.")
-#     return 1 if failures else 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
