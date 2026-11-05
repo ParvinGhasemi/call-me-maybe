@@ -3,6 +3,7 @@
 import unittest
 from pathlib import Path
 from copy import deepcopy
+from typing import Any
 
 from src.function_validator import validate_functions
 from src.json_loader import load_json
@@ -13,7 +14,7 @@ class TestFunctionValidator(unittest.TestCase):
 
     def setUp(self) -> None:
         """Create a fresh valid definition before each test."""
-        self.definition = {
+        self.definition: dict[str, Any] = {
             "name": "fn_add_numbers",
             "description": "Add two numbers.",
             "parameters": {
@@ -47,7 +48,7 @@ class TestFunctionValidator(unittest.TestCase):
 
     def test_invalid_definitions(self) -> None:
         """Reject wrong types, extra fields, and invalid nested schemas."""
-        changes = [
+        changes: list[dict[str, Any]] = [
             {"name": 42},
             {"description": False},
             {"parameters": []},
