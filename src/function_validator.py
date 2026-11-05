@@ -1,34 +1,29 @@
+"""Validate function definitions and reject duplicate function names."""
+
 from typing import Literal, Any
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 
-"""
-  {
-    "name": "fn_add_numbers",
-    "description": "Add two numbers together and return their sum.",
-    "parameters": {
-      "a": {
-        "type": "number"
-      },
-      "b": {
-        "type": "number"
-      }
-    },
-    "returns": {
-      "type": "number"
-    }
-  },
-"""
-
-
 class TypeDefinition(BaseModel):
-    """Describe a parameter or return type."""
+    """Describe a supported scalar JSON type.
+
+    Attributes:
+        type: One of string, number, integer, or boolean. Describes the
+            expected type rather than validating an actual argument value.
+    """
     model_config = ConfigDict(strict=True, extra="forbid")
     type: Literal["string", "number", "integer", "boolean"]
 
 
 class FunctionDefinition(BaseModel):
-    """Describe an available function and its argument types."""
+    """Describe an available function with strict field validation.
+
+    Attributes:
+        name: Function identifier.
+        description: Explanation of the function's purpose.
+        parameters: Parameter names mapped to validated type descriptions.
+        returns: Validated description of the return type.
+    """
     model_config = ConfigDict(strict=True, extra="forbid")
 
     name: str
@@ -38,7 +33,19 @@ class FunctionDefinition(BaseModel):
 
 
 def validate_functions(data: Any) -> list[FunctionDefinition]:
-    """Validate a list of function definitions."""
+    """Validate function definitions and require unique names.
+
+    Args:
+        data: Unvalidated Python value returned by a JSON loader.
+
+    Returns:
+        Validated definitions in input order. An empty list is accepted.
+
+    Raises:
+        TypeError: If data is not a list.
+        ValueError: If an entry fails validation or function names repeat.
+            Entry failures preserve the Pydantic error as their cause.
+    """
     if not isinstance(data, list):
         raise TypeError(
             "Function definitions must be a JSON array."
