@@ -31,6 +31,18 @@ run only the loader tests:<br>
 | `OSError` | Another filesystem problem, such as permission denied |
 
 
+## HOW TO run
+# default behavior:
+uv run python -m src
+
+# Choose a valid file containing one prompt:
+uv run python -m src --input src/data/input/valid.json
+
+# Choose an invalid prompt:
+uv run python -m src --input src/data/input/wrong_prompt_type.json
+
+# Display automatically generated instructions:
+uv run python -m src --help
 
 
 
@@ -40,4 +52,4 @@ run only the loader tests:<br>
 - https://www.geeksforgeeks.org/python/python-json/
 - https://docs.python.org/3/library/unittest.html
 - https://realpython.com/python-unittest/#creating-test-cases
-
+- https://docs.python.org/3/library/argparse.html

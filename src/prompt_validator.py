@@ -1,5 +1,6 @@
 """Validate loaded prompt data using strict Pydantic models."""
 
+from importlib.metadata import entry_points
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, ValidationError
@@ -36,8 +37,15 @@ def validate_prompts(data: Any) -> list[PromptEntry]:
         try:
             prompts.append(PromptEntry.model_validate(entry))
         except ValidationError as error:
+            messages: list[str] = []
+
+            for issue in error.errors():
+                location: str = ".".join(str(part) for part in issue['loc'])
+                message: str = f"{location}: {issue['msg']}"
+                messages.append(message)
+            details: str = ";   ".join(messages)
             raise ValueError(
-                f"Invalid value error at index {index}: {entry}"
+                f"Invalid value error at index {index}: {details}"
             ) from error
 
     return prompts
