@@ -1,6 +1,7 @@
 """Load and validate function definitions and prompts from default paths."""
 
 
+import argparse
 from pathlib import Path
 
 from .json_loader import InputLoadError, load_json
@@ -16,16 +17,37 @@ def main() -> int:
         validation fails. Expected errors are printed for the user.
     """
     input_directory: Path = Path(__file__).resolve().parent / "data" / "input"
+    parser = argparse.ArgumentParser(
+        description="Load and validate function definitions and prompts (json)"
+    )
+    parser.add_argument(
+        "--functions_definition",
+        type=Path,
+        default=input_directory / "functions_definition.json",
+        required=False,
+        help="give it the path to the functions definition JSON file.",
+        metavar="FUNCTIONS_FILE",
+    )
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=input_directory / "function_calling_tests.json",
+        required=False,
+        help="give it tha path to the prompts JSON file.",
+        metavar="               PROMPTS_FILE",
+    )
+    args = parser.parse_args()
 
     try:
         function_data = (
-            load_json(input_directory / "functions_definition.json")
+            load_json(args.functions_definition)
         )
         prompts_data = (
-            load_json(input_directory / "function_calling_tests.json")
+            load_json(args.input)
         )
         functions: list[FunctionDefinition] = validate_functions(function_data)
         prompts: list[PromptEntry] = validate_prompts(prompts_data)
+
     except (InputLoadError, ValueError, TypeError) as error:
         print(f"ERROR (something went wrong!) -> {error}")
         return 1
