@@ -14,4 +14,7 @@ dev = [
 ]
 
 [tool.mypy]
-exclude = ["^llm_sdk/"]
+exclude = [
+    "^\\.venv/",
+    "^llm_sdk/",
+]

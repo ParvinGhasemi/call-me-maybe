@@ -1,6 +1,5 @@
 """Validate loaded prompt data using strict Pydantic models."""
 
-from importlib.metadata import entry_points
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, ValidationError
